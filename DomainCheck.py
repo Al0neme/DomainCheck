@@ -22,14 +22,20 @@ def check_domain(domain):
             status_code = str(resp.status_code)
             if "30" in str(resp.status_code):
                 # 请求跳转内容
-                location = "Location: " + url + " "
+                try:
+                    location = "Location: " + resp.headers['Location'] + " "
+                except Exception:
+                    location = ""
                 resp = requests.get(url=url, headers=headers, verify=False, timeout=10)
                 resp.close()
             ip = socket.gethostbyname(domain)
             resp.encoding = resp.apparent_encoding  # 编码处理，避免乱码
             content = resp.text
             soup = bs(content, 'html.parser')
-            title = soup.find("title").text
+            try:
+                title = soup.find("title").text
+            except Exception:
+                title = ""
             # 返回结果
             return url + " [" + status_code + "] ip[ " + ip + " ] " + location + "title[ " + str(title).strip() + " ]"
         except Exception as e:
